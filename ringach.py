@@ -382,10 +382,10 @@ class FigViewer():
         self.file_list = [f for f in files if f.suffix in suffixes]
 
         def show(self):
-        with self.output:
-            display(HTML(open(self.file_list[self.file_idx]).read()))
-            clear_output(wait=True)
-            self.file_idx = self.file_idx + 1
+            with self.output:
+                display(HTML(open(self.file_list[self.file_idx]).read()))
+                clear_output(wait=True)
+                self.file_idx = self.file_idx + 1
 
     def on_button_clicked(self, _):
         self.show()
