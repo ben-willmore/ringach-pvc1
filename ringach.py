@@ -219,6 +219,14 @@ class RingachData():
             rep_numbers = []
             reps = unpack(res['repeat'])
 
+            sym = [unpack(s) for s in unpack(res['symbols'])]
+
+            if 'movie_id' not in sym:
+                print('Condition %d is not a movie stimulus' % condition_idx)
+                continue
+
+            val = [unpack(s) for s in unpack(res['values'])]
+
             for rep_idx in range(n_reps):
                 if n_reps == 1:
                     rep = unpack(reps)
@@ -229,12 +237,10 @@ class RingachData():
                 spike_shapes.append(unpack(dat[1]))
                 rep_numbers.append(np.array([rep_idx]*spike_times[-1].shape[0]))
 
-                
-            sym = [unpack(s) for s in unpack(res['symbols'])]
-            val = [unpack(s) for s in unpack(res['values'])]
             conditions.append({'condition_params': condition_params,
                          'symbols': sym,
                          'values': val,
+                         'n_reps': n_reps,
                          'spike_times': np.concatenate(spike_times),
                          'spike_shapes': np.concatenate(spike_shapes, axis=1),
                          'rep_numbers': np.concatenate(rep_numbers)})
