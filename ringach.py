@@ -46,7 +46,7 @@ class RingachStim():
     
 class RingachStimPreloaded(RingachStim):
     
-    def __init__(self, downsample=2, whitened=True, data_dir='.'):
+    def __init__(self, downsample=2, whitened=False, data_dir='.'):
         self.data_dir = data_dir
         self.frames = None
         self.downsample = downsample
@@ -115,7 +115,7 @@ class RingachStimPreloaded(RingachStim):
 
 class RingachStimPiecemeal(RingachStim):
 
-    def __init__(self, downsample=2, whitened=True, data_dir='.'):
+    def __init__(self, downsample=2, whitened=False, data_dir='.'):
         self.data_dir = '.'
         self.frames = None
         self.downsample = downsample
@@ -170,6 +170,7 @@ class RingachData():
             self.filename = dataset
         else:
             self.filename = self.list_files(disp=False)[dataset]
+        print('Loading from %s' % self.filename)
         self.channel_idx = channel_idx
         self.load_data()
         if spike_sort:
@@ -183,8 +184,8 @@ class RingachData():
         data_dir = Path(self.data_dir, 'pvc-1', 'crcns-ringach-data', 'neurodata')
 
         data_files = []
-        for subdir in data_dir.iterdir():
-            for file in subdir.iterdir():
+        for subdir in sorted(data_dir.iterdir()):
+            for file in sorted(subdir.iterdir()):
                 data_files.append(file)
                 if disp:
                     print(file)
@@ -203,7 +204,7 @@ class RingachData():
         Get spike data for one channel
         '''
         pepANA, n_channels = self.open_file()
-        print('Extracting spike data', end='')
+        print('Extracting spike data')
         lor = unpack(unpack(pepANA)['listOfResults'])
         n_conditions = lor.shape[0]
         conditions = []
@@ -243,7 +244,7 @@ class RingachData():
                                'conditions': conditions}
 
     def cluster_spikes(self, plot=False):
-        print('Clustering spikes', end='')
+        print('Clustering spikes')
 
         all_spike_times = np.concatenate([c['spike_times'] for c in self.electrode_data['conditions']])
         all_spike_shapes = np.concatenate([c['spike_shapes'] for c in self.electrode_data['conditions']], axis=1)
