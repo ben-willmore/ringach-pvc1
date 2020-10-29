@@ -246,6 +246,9 @@ class RingachData():
                          'rep_numbers': np.concatenate(rep_numbers)})
 
         print('done')
+        if len(conditions) == 0:
+            raise ValueError('No movie data in this dataset')
+
         self.electrode_data = {'n_conditions': n_conditions,
                                'conditions': conditions}
 
@@ -270,7 +273,7 @@ class RingachData():
             for idx in range(c['spike_times'].shape[0]):
                 time = c['spike_times'][idx]
                 shape = c['spike_shapes'][:, idx]
-                rep = c['spike_times'][idx]
+                rep = c['rep_numbers'][idx]
                 d0 = np.sum((shape-codebook[0])**2)
                 d1 = np.sum((shape-codebook[1])**2)
                 if d1 < d0:
@@ -315,7 +318,18 @@ class RingachData():
             frame_idxes = (np.floor(condition['spike_times']/3*90) + offset).astype(np.int)
             data.append((condition['values'][0], condition['values'][1], frame_idxes))
         return data
-    
+
+    def get_spike_times(self):
+        '''
+        Return [(movie_idx, segment_idx, spike_times, repetition_numbers), ..] when spikes occurred
+        '''
+        data = []
+        for condition in self.electrode_data['conditions']:
+            if condition['symbols'] != ['movie_id', 'segment_id']:
+                raise ValueError('Unexpected parameters, not movie_id and segment_id')
+            data.append((condition['values'][0], condition['values'][1], condition['spike_times'], condition['rep_numbers']))
+        return data
+
 def get_stas_sqdevs(data, stim, offsets):
     '''
     Get STAS and sum of squared deviations for a range of time offsets
